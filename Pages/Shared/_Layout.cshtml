@@ -1,0 +1,76 @@
+@inject IOptions<SessionDemoOptions> Opts
+@{
+    var o = Opts.Value;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] – Session expiry demo</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body data-warn-seconds="@o.WarnSeconds"
+      data-keepalive-seconds="@o.KeepAliveSeconds"
+      data-server-now="@DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()">
+
+    <header class="topbar">
+        <strong>Session expiry demo</strong>
+        <span class="spacer"></span>
+        <span>@User.Identity?.Name</span>
+        <a asp-area="MicrosoftIdentity" asp-controller="Account" asp-action="SignOut">Sign out</a>
+    </header>
+
+    @* Antiforgery request token used by script requests (header: RequestVerificationToken) *@
+    @Html.AntiForgeryToken()
+
+    <div class="layout">
+        <main>@RenderBody()</main>
+
+        <aside class="debug">
+            <h3>Session debug</h3>
+            <dl>
+                <dt>State</dt><dd id="dbg-state">ok</dd>
+                <dt>Expires at</dt><dd id="dbg-exp">–</dd>
+                <dt>Time left</dt><dd id="dbg-left">–</dd>
+                <dt>Lifetime</dt><dd>@o.ExpireSeconds s (sliding, renews after @(o.ExpireSeconds / 2) s)</dd>
+            </dl>
+            <label class="check">
+                <input type="checkbox" id="dbg-activity" checked />
+                Typing / clicking counts as activity (sends keep-alive)
+            </label>
+            <div class="buttons">
+                <button type="button" id="dbg-ping">Keep-alive now</button>
+                @if (o.EnableDebugEndpoints)
+                {
+                    <button type="button" id="dbg-kill" title="Server drops the auth cookie, client still thinks it's valid">
+                        Kill auth cookie
+                    </button>
+                }
+            </div>
+            <h4>Log</h4>
+            <ol id="dbg-log" class="log" reversed></ol>
+        </aside>
+    </div>
+
+    @* Warning shown shortly before expiry *@
+    <div id="session-warning" class="toast" role="status" hidden>
+        <span id="session-warning-text"></span>
+        <button type="button" id="session-stay" class="primary">Stay signed in</button>
+    </div>
+
+    @* Blocking overlay after expiry. The page underneath (incl. open modals) is untouched. *@
+    <dialog id="session-expired" class="session-expired" aria-labelledby="session-expired-title">
+        <h2 id="session-expired-title">You've been signed out</h2>
+        <p id="session-expired-msg"></p>
+        <p>Your unsaved changes are still on this page. Sign in again to continue. The page won't reload.</p>
+        <div class="buttons">
+            <button type="button" id="session-signin" class="primary">Sign in again</button>
+            <button type="button" id="session-signin-redirect">Sign in with redirect</button>
+        </div>
+    </dialog>
+
+    <script src="~/js/session-ui.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

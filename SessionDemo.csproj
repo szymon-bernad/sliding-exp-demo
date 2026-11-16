@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>session-demo-7c1e2a4b</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Floating major version so it restores against whatever 3.x is current; pin it in a real project. -->
+    <PackageReference Include="Microsoft.Identity.Web" Version="3.*" />
+    <PackageReference Include="Microsoft.Identity.Web.UI" Version="3.*" />
+  </ItemGroup>
+
+</Project>

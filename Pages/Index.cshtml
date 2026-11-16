@@ -1,0 +1,40 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Notes";
+}
+
+<h1>Notes</h1>
+<p class="hint">
+    Open <em>New note</em>, type something, then leave it alone until the session runs out
+    (or untick the activity checkbox in the debug panel). Your text should still be there after you sign in again.
+</p>
+
+<div class="buttons">
+    <button type="button" id="new-note" class="primary">New note</button>
+    <a href="/">Reload page (full navigation)</a>
+</div>
+
+<ul id="notes" class="notes">
+    @foreach (var n in Model.Notes)
+    {
+        <li><strong>@n.Title</strong> <span class="meta">#@n.Id · @n.Author · @n.Created.ToLocalTime().ToString("HH:mm:ss")</span><div>@n.Body</div></li>
+    }
+</ul>
+
+<dialog id="note-dialog" class="note-dialog" aria-labelledby="note-dialog-title">
+    <form id="note-form">
+        <h2 id="note-dialog-title">New note</h2>
+        <label>Title <input name="title" autocomplete="off" required /></label>
+        <label>Body <textarea name="body" rows="6"></textarea></label>
+        <p id="note-error" class="error" role="alert"></p>
+        <div class="buttons">
+            <button type="submit" class="primary">Save</button>
+            <button type="button" id="note-cancel">Discard</button>
+        </div>
+    </form>
+</dialog>
+
+@section Scripts {
+    <script src="~/js/notes.js" asp-append-version="true"></script>
+}
